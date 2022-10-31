@@ -94,9 +94,6 @@ class NativeMethodReflection implements ExtendedMethodReflection
 		return $this->reflection->getName();
 	}
 
-	/**
-	 * @return ParametersAcceptorWithPhpDocs[]
-	 */
 	public function getVariants(): array
 	{
 		return $this->variants;
