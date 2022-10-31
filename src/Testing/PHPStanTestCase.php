@@ -175,7 +175,6 @@ abstract class PHPStanTestCase extends TestCase
 				new PropertyReflectionFinder(),
 				$this->getParser(),
 				$container->getByType(NodeScopeResolver::class),
-				$this->shouldTreatPhpDocTypesAsCertain(),
 				$container->getByType(PhpVersion::class),
 				$container->getParameter('featureToggles')['explicitMixedInUnknownGenericNew'],
 				$container->getParameter('featureToggles')['explicitMixedForGlobalVariables'],
