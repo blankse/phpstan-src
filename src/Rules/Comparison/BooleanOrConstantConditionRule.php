@@ -72,7 +72,7 @@ class BooleanOrConstantConditionRule implements Rule
 				}
 
 				$booleanNativeType = $this->helper->getNativeBooleanType(
-					$rightScope->doNotTreatPhpDocTypesAsCertain(),
+					$rightScope,
 					$originalNode->right,
 				);
 				if ($booleanNativeType instanceof ConstantBooleanType) {
@@ -99,7 +99,7 @@ class BooleanOrConstantConditionRule implements Rule
 						return $ruleErrorBuilder;
 					}
 
-					$booleanNativeType = $scope->doNotTreatPhpDocTypesAsCertain()->getType($originalNode);
+					$booleanNativeType = $scope->getNativeType($originalNode);
 					if ($booleanNativeType instanceof ConstantBooleanType) {
 						return $ruleErrorBuilder;
 					}
