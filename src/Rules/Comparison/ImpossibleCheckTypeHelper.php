@@ -60,7 +60,8 @@ class ImpossibleCheckTypeHelper
 			if ($node->name instanceof Node\Name) {
 				$functionName = strtolower((string) $node->name);
 				if ($functionName === 'assert' && $argsCount >= 1) {
-					$assertValue = $scope->getType($node->getArgs()[0]->value)->toBoolean();
+					$arg = $node->getArgs()[0]->value;
+					$assertValue = ($this->treatPhpDocTypesAsCertain ? $scope->getType($arg) : $scope->getNativeType($arg))->toBoolean();
 					if (!$assertValue instanceof ConstantBooleanType) {
 						return null;
 					}
@@ -82,7 +83,8 @@ class ImpossibleCheckTypeHelper
 				} elseif ($functionName === 'array_search') {
 					return null;
 				} elseif ($functionName === 'in_array' && $argsCount >= 3) {
-					$haystackType = $scope->getType($node->getArgs()[1]->value);
+					$haystackArg = $node->getArgs()[1]->value;
+					$haystackType = ($this->treatPhpDocTypesAsCertain ? $scope->getType($haystackArg) : $scope->getNativeType($haystackArg));
 					if ($haystackType instanceof MixedType) {
 						return null;
 					}
@@ -91,7 +93,8 @@ class ImpossibleCheckTypeHelper
 						return null;
 					}
 
-					$needleType = $scope->getType($node->getArgs()[0]->value);
+					$needleArg = $node->getArgs()[0]->value;
+					$needleType = ($this->treatPhpDocTypesAsCertain ? $scope->getType($needleArg) : $scope->getNativeType($needleArg));
 					$valueType = $haystackType->getIterableValueType();
 					$constantNeedleTypesCount = count(TypeUtils::getConstantScalars($needleType));
 					$constantHaystackTypesCount = count(TypeUtils::getConstantScalars($valueType));
@@ -154,8 +157,11 @@ class ImpossibleCheckTypeHelper
 						}
 					}
 				} elseif ($functionName === 'method_exists' && $argsCount >= 2) {
-					$objectType = $scope->getType($node->getArgs()[0]->value);
-					$methodType = $scope->getType($node->getArgs()[1]->value);
+					$objectArg = $node->getArgs()[0]->value;
+					$objectType = ($this->treatPhpDocTypesAsCertain ? $scope->getType($objectArg) : $scope->getNativeType($objectArg));
+
+					$methodArg = $node->getArgs()[1]->value;
+					$methodType = ($this->treatPhpDocTypesAsCertain ? $scope->getType($methodArg) : $scope->getNativeType($methodArg));
 
 					if ($objectType instanceof ConstantStringType
 						&& !$this->reflectionProvider->hasClass($objectType->getValue())
@@ -198,7 +204,7 @@ class ImpossibleCheckTypeHelper
 				return null;
 			}
 
-			$rootExprType = $scope->getType($rootExpr);
+			$rootExprType = ($this->treatPhpDocTypesAsCertain ? $scope->getType($rootExpr) : $scope->getNativeType($rootExpr));
 			if ($rootExprType instanceof ConstantBooleanType) {
 				return $rootExprType->getValue();
 			}
@@ -289,7 +295,7 @@ class ImpossibleCheckTypeHelper
 			return '';
 		}
 
-		$descriptions = array_map(static fn (Arg $arg): string => $scope->getType($arg->value)->describe(VerbosityLevel::value()), $args);
+		$descriptions = array_map(fn (Arg $arg): string => ($this->treatPhpDocTypesAsCertain ? $scope->getType($arg->value) : $scope->getNativeType($arg->value))->describe(VerbosityLevel::value()), $args);
 
 		if (count($descriptions) < 3) {
 			return sprintf(' with %s', implode(' and ', $descriptions));
