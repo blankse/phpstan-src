@@ -3625,11 +3625,6 @@ class MutatingScope implements Scope
 
 		$specifiedTypes = $this->typeSpecifier->specifyTypesInCondition($this, $expr, TypeSpecifierContext::createTruthy());
 		$scope = $this->filterBySpecifiedTypes($specifiedTypes);
-
-		$nativeScope = $this->promoteNativeTypes();
-		$nativeSpecifiedTypes = $this->typeSpecifier->specifyTypesInCondition($nativeScope, $expr, TypeSpecifierContext::createTruthy());
-		$scope->nativeExpressionTypes = $nativeScope->filterBySpecifiedTypes($nativeSpecifiedTypes)->expressionTypes;
-
 		$this->truthyScopes[$exprString] = $scope;
 
 		return $scope;
@@ -3648,10 +3643,6 @@ class MutatingScope implements Scope
 
 		$specifiedTypes = $this->typeSpecifier->specifyTypesInCondition($this, $expr, TypeSpecifierContext::createFalsey());
 		$scope = $this->filterBySpecifiedTypes($specifiedTypes);
-		$nativeScope = $this->promoteNativeTypes();
-		$nativeSpecifiedTypes = $this->typeSpecifier->specifyTypesInCondition($nativeScope, $expr, TypeSpecifierContext::createFalsey());
-		$scope->nativeExpressionTypes = $nativeScope->filterBySpecifiedTypes($nativeSpecifiedTypes)->expressionTypes;
-
 		$this->falseyScopes[$exprString] = $scope;
 
 		return $scope;
